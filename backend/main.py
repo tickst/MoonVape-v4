@@ -415,7 +415,7 @@ async def lifespan(app):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=[WEBAPP], allow_methods=["*"], allow_headers=["*"])
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health(): return {"ok": True}
 
 @app.post("/telegram/webhook")
