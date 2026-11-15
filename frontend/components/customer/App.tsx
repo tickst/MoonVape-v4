@@ -38,14 +38,6 @@ export default function CustomerApp() {
   const [tooYoung, setTooYoung] = useState(false)
 
   const fail = (m: string) => { setToast({ kind: 'err', text: m }); haptic('error') }
-  const consent = !!me?.user?.marketing_consent_at
-  async function toggleNotify() {
-    try {
-      await api('/api/me/notifications', { method: 'PUT', body: JSON.stringify({ notify_stock: !consent }) })
-      setMe((m: any) => ({ ...m, user: { ...m.user, notify_stock: !consent, marketing_consent_at: !consent ? new Date().toISOString() : null } }))
-      setToast({ kind: 'ok', text: consent ? 'Вы отписались от сообщений о наличии' : 'Сообщения о наличии включены' })
-    } catch (e: any) { fail(e.message) }
-  }
   const done = (m: string) => setToast({ kind: 'ok', text: m })
   const city = me?.city || null
   const adult = !!me?.user?.age_confirmed_at
@@ -241,11 +233,6 @@ export default function CustomerApp() {
       <div className="mv-card mv-row mv-between" style={{ marginTop: 12 }}>
         <div><div className="mv-sub">Город</div><b>{city.name}</b></div>
         <button className="mv-btn ghost sm" onClick={() => setCityPicker(true)}>Сменить город</button>
-      </div>
-      <div className="mv-card" style={{ marginTop: 12 }}>
-        <div className="mv-row mv-between"><div><div className="mv-sub">Сообщения о наличии</div><b>{consent ? 'Включены' : 'Выключены'}</b></div>
-          <button className="mv-btn ghost sm" style={{ width: 'auto' }} onClick={toggleNotify}>{consent ? 'Отключить' : 'Включить'}</button></div>
-        <div className="mv-sub" style={{ fontSize: 12, marginTop: 8 }}>Включая, вы соглашаетесь получать от магазина информационные сообщения о поступлении товара в Telegram. Согласие можно отозвать в любой момент здесь же.</div>
       </div>
       {orders === null && <Loading />}
       {orders && <>

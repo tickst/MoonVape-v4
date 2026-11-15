@@ -303,9 +303,6 @@ class CityIn(BaseModel):
 class OrderPreviewIn(BaseModel):
     items: list[Item] = Field(min_length=1, max_length=100)
 
-class NotifyIn(BaseModel):
-    notify_stock: bool
-
 class StockIn(BaseModel):
     inventory_id: UUID; quantity: int = Field(ge=0, le=100000)
     kind: Literal["receipt", "adjust"] = "adjust"; reason: str = Field("", max_length=200)
@@ -467,11 +464,6 @@ async def set_city(b: CityIn, u=Depends(current_user)):
     await db("PATCH", "users", params={"id": f"eq.{u['id']}"}, json={"city_id": b.city_id, "updated_at": now_iso()})
     # Корзина не переносится на другой склад автоматически: фронтенд покажет предупреждение.
     return {"ok": True, "city_id": b.city_id}
-
-@app.put("/api/me/notifications")
-async def set_notifications(b: NotifyIn, u=Depends(current_user)):
-    await db("PATCH", "users", params={"id": f"eq.{u['id']}"}, json={"notify_stock": b.notify_stock, "marketing_consent_at": now_iso() if b.notify_stock else None})
-    return {"ok": True}
 
 @app.get("/api/catalog")
 async def catalog(q: str = "", u=Depends(current_user)):
@@ -773,7 +765,7 @@ async def build_broadcast(city_id: str, mode: str, product_ids: list, category_i
 
 async def count_recipients(city_id: str) -> int:
     rows = await db("GET", "users", params={"city_id": f"eq.{city_id}", "bot_started_at": "not.is.null",
-                                            "notify_stock": "eq.true", "marketing_consent_at": "not.is.null", "bot_blocked": "eq.false", "select": "telegram_id"}) or []
+                                            "bot_blocked": "eq.false", "select": "telegram_id"}) or []
     return len(rows)
 
 @app.get("/api/admin/broadcast/preview")
