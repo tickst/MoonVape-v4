@@ -71,11 +71,11 @@ begin
   select w.win_from, w.win_to into wf, wt from _fin_window(p_date_from, p_date_to) w;
   pf := wf - (wt - wf);
 
-  select coalesce(jsonb_agg(jsonb_build_object('day', to_char(s.day,'YYYY-MM-DD'), 'revenue', s.revenue,
-           'gross_profit', s.gp, 'orders', s.n) order by s.day), '[]'::jsonb)
+  select coalesce(jsonb_agg(jsonb_build_object('day', to_char(s.sales_day,'YYYY-MM-DD'), 'revenue', s.revenue,
+           'gross_profit', s.gp, 'orders', s.n) order by s.sales_day), '[]'::jsonb)
   into series
   from (
-    select (o.paid_at at time zone 'Europe/Berlin')::date day,
+    select (o.paid_at at time zone 'Europe/Berlin')::date AS sales_day,
            round(sum(oi.unit_price*oi.quantity),2) revenue,
            round(sum(oi.unit_price*oi.quantity - coalesce(oi.cogs_total, coalesce(oi.unit_cost,0)*oi.quantity)),2) gp,
            count(distinct o.id) n
