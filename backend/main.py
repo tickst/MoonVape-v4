@@ -745,7 +745,7 @@ def _broadcast_text(city_name: str, mode: str, chosen: list, cat_names: dict) ->
         lines = [f"• {e(p['name'])}" for p in chosen[:30]]
         if len(chosen) > 30: lines.append(f"… и ещё {len(chosen) - 30}")
         body = "В наличии появились:\n" + "\n".join(lines)
-    return head + body + f"\n\nМагазин: {WEBAPP}"
+    return head + body
 
 
 async def build_broadcast(city_id: str, mode: str, product_ids: list, category_ids: list) -> dict:
