@@ -75,7 +75,7 @@ begin
          'gross_profit', s.gp, 'orders', s.n) order by s.sales_day), '[]'::jsonb)
 into series
 from (
-  select (o.paid_at at time zone 'Europe/Berlin')::date AS sales_day,
+ select (o.paid_at at time zone 'Europe/Berlin')::date as day,
            round(sum(oi.unit_price*oi.quantity),2) revenue,
            round(sum(oi.unit_price*oi.quantity - coalesce(oi.cogs_total, coalesce(oi.unit_cost,0)*oi.quantity)),2) gp,
            count(distinct o.id) n
